@@ -20,7 +20,7 @@ unggah, validasi, baca struktur, dan ekspor round-trip.
 - Rollback berbasis bytes (akan datang di Phase 4).
 
 ## Persyaratan
-- Python 3.10+ (deploy: 3.12)
+- Python 3.10+ (deploy: 3.12–3.14)
 - Windows, Linux, atau macOS
 
 ## Instalasi
@@ -39,11 +39,12 @@ Community Cloud); `requirements-dev.txt` menambahkan pytest.
 
 ## Deploy ke Streamlit Community Cloud
 
-1. Push branch ke GitHub (`kurniawan-Donn/docx`).
+1. Push branch ke GitHub (`kurniawan-Donn/docxlint-app`).
 2. Buka https://share.streamlit.io, masuk dengan akun GitHub, pilih
    **Create app → Deploy a public app from GitHub**.
-3. Repository `kurniawan-Donn/docx`, branch yang di-push, main file
-   `app.py`. Di **Advanced settings** pilih Python **3.12**.
+3. Repository `kurniawan-Donn/docxlint-app`, branch `main`, main file
+   `app.py`. Di **Advanced settings** pilih Python **3.12** atau lebih baru
+   (diuji sampai 3.14 dengan lxml 6).
 4. Di **Secrets**, tambahkan `DOCXLINT_PUBLIC_DEMO = "1"` agar aplikasi
    menampilkan peringatan demo publik (dokumen non-sensitif saja).
 5. Klik **Deploy**. Konfigurasi `.streamlit/config.toml` (tema, batas upload
