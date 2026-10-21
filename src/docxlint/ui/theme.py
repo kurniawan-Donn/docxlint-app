@@ -386,7 +386,8 @@ table.dl-table td {{ padding: 8px; border-bottom: 1px solid var(--dl-border); ve
 .dl-brand .dl-logo {{ width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; box-shadow: none; }}
 .dl-brand-name {{ font-size: 20px; font-weight: 750; color: var(--dl-text); letter-spacing: -0.02em; }}
 .dl-side-list {{ list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }}
-.dl-side-list li {{ display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 13px; color: var(--dl-text); }}
+.dl-side-list li {{ display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-size: 13px; color: var(--dl-text); }}
+.dl-side-list .dl-pill {{ white-space: normal; }}
 
 /* Footer */
 .dl-footer {{ margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--dl-border); color: var(--dl-secondary); font-size: 12px; text-align: center; }}
