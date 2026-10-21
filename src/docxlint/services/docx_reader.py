@@ -49,6 +49,7 @@ def _extract_runs(paragraph) -> List[Run]:  # type: ignore[no-untyped-def]
                 is_complex_run=_is_complex_run(run._element),
                 bold=run.bold,
                 italic=run.italic,
+                xml_element=run._element,
             )
         )
     return runs
@@ -84,6 +85,7 @@ def _read_paragraph_block(
         runs=runs,
         style_name=style_name,
         numbering=numbering,
+        xml_element=paragraph._element,
     )
 
 

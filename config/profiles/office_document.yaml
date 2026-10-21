@@ -1,0 +1,33 @@
+schema_version: 1
+profile_id: office_document
+name: Dokumen Kantor
+description: Template dokumen kantor umum (Calibri/Arial 11-12pt).
+version: "1.0.0"
+source: builtin
+notes: Bukan standar resmi kantor manapun.
+editorial_policy:
+  review_configured_foreign_terms: true
+  review_unlisted_foreign_candidates: false
+rules:
+  FMT_FONT_FAMILY:
+    enabled: true
+    severity: low
+    params:
+      allowed: ["Calibri", "Arial", "Helvetica"]
+  FMT_FONT_SIZE:
+    enabled: true
+    severity: low
+    params:
+      allowed_pt: [10, 11, 12]
+  FMT_ALIGNMENT:
+    enabled: false
+  FMT_LINE_SPACING:
+    enabled: false
+  FMT_PARAGRAPH_SPACING:
+    enabled: true
+    severity: info
+    params:
+      max_before_pt: 12
+      max_after_pt: 12
+  FMT_INDENT:
+    enabled: false

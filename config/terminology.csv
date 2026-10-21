@@ -1,0 +1,14 @@
+term,italic,category,note,language,case_sensitive,priority
+machine learning,true,istilah_asing,gunakan italic,en,false,10
+deep learning,true,istilah_asing,gunakan italic,en,false,10
+natural language processing,true,istilah_asing,gunakan italic,en,false,10
+streaming,true,istilah_asing,italic pada konteks teknis,en,false,5
+cloud computing,true,istilah_asing,gunakan italic,en,false,10
+change management,true,istilah_asing,gunakan italic,en,false,10
+penetration testing,true,istilah_asing,gunakan italic,en,false,10
+API,false,akronim,jangan italic,,true,10
+CPU,false,akronim,jangan italic,,true,10
+RAM,false,akronim,jangan italic,,true,10
+GPU,false,akronim,jangan italic,,true,10
+Streamlit,false,nama_produk,jangan italic,,true,10
+DocxLint,false,nama_produk,jangan italic,,true,10

@@ -1,0 +1,40 @@
+schema_version: 1
+profile_id: it_audit_report
+name: Laporan Audit TI
+description: Template laporan audit TI (bukan standar resmi lembaga audit).
+version: "1.0.0"
+source: builtin
+notes: Contoh awal. Ganti sesuai pedoman audit organisasi Anda.
+editorial_policy:
+  review_configured_foreign_terms: true
+  review_unlisted_foreign_candidates: false
+  respect_existing_italic: true
+rules:
+  FMT_FONT_FAMILY:
+    enabled: true
+    severity: medium
+    params:
+      allowed: ["Arial", "Calibri", "Helvetica"]
+  FMT_FONT_SIZE:
+    enabled: true
+    severity: medium
+    params:
+      allowed_pt: [10, 11, 12]
+  FMT_ALIGNMENT:
+    enabled: true
+    severity: low
+    params:
+      allowed: ["both", "left"]
+  FMT_LINE_SPACING:
+    enabled: true
+    severity: low
+    params:
+      allowed: [1.15, 1.5]
+  FMT_PARAGRAPH_SPACING:
+    enabled: true
+    severity: info
+    params:
+      max_before_pt: 12
+      max_after_pt: 12
+  FMT_INDENT:
+    enabled: false

@@ -1,0 +1,17 @@
+# Token yang selalu dianggap benar. Satu per baris. UTF-8.
+docx
+streamlit
+python
+python-docx
+lxml
+pytest
+api
+json
+yaml
+markdown
+url
+https
+html
+xml
+csv
+pdf

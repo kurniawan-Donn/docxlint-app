@@ -1,7 +1,4 @@
-"""Model data inti DocxLint.
-
-Mengikuti docs/data_model.md. Tidak menambah nama field baru.
-"""
+"""Model data inti DocxLint. Mengikuti docs/data_model.md."""
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterator, List, Optional
@@ -9,12 +6,6 @@ from typing import Any, Dict, Iterator, List, Optional
 
 @dataclass
 class Run:
-    """Satu run teks dalam sebuah paragraf.
-
-    `char_start`/`char_end` adalah offset terhadap teks gabungan paragraf,
-    bukan offset absolut dokumen.
-    """
-
     run_index: int
     text: str
     char_start: int
@@ -22,29 +13,23 @@ class Run:
     is_complex_run: bool
     bold: Optional[bool] = None
     italic: Optional[bool] = None
+    xml_element: Any = None
 
 
 @dataclass
 class Block:
-    """Blok logis: paragraf, heading, list item, atau paragraf dalam sel tabel."""
-
     block_path: str
-    block_type: str  # paragraph | heading | list_item | hyperlink
-    part: str        # document | header[N] | footer[N]
+    block_type: str
+    part: str
     text: str
     runs: List[Run] = field(default_factory=list)
     style_name: Optional[str] = None
     numbering: Optional[Dict[str, Any]] = None
+    xml_element: Any = None
 
 
 @dataclass
 class DocumentSnapshot:
-    """Hasil pembacaan dokumen pada satu titik waktu.
-
-    `parts` memetakan nama bagian (mis. "document", "header[0]")
-    ke daftar Block.
-    """
-
     snapshot_id: str
     parts: Dict[str, List[Block]] = field(default_factory=dict)
 
@@ -55,7 +40,7 @@ class DocumentSnapshot:
 
 @dataclass
 class Location:
-    """Lokasi temuan. Belum dipakai di Phase 2, disiapkan untuk Phase 3+."""
+    """Lokasi temuan. Sesuai docs/data_model.md."""
 
     snapshot_id: str
     part: str
@@ -64,4 +49,6 @@ class Location:
     run_index: int
     char_start: int
     char_end: int
+    section_index: Optional[int] = None
+    global_text_offset: Optional[int] = None
     original_text_hash: Optional[str] = None
