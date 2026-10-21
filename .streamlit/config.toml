@@ -1,5 +1,24 @@
+# Harus berada di `.streamlit/` (dengan titik) agar dibaca Streamlit.
+
 [browser]
+# Mode lokal: jangan kirim telemetri penggunaan.
 gatherUsageStats = false
 
 [server]
 headless = true
+
+[client]
+# Jangan tampilkan menu multipage otomatis.
+showSidebarNavigation = false
+
+[theme]
+# Token sinkron dengan src/docxlint/ui/theme.py.
+base = "light"
+primaryColor = "#2563EB"
+backgroundColor = "#FAFAFA"
+secondaryBackgroundColor = "#F3F4F6"
+textColor = "#111827"
+borderColor = "#E5E7EB"
+baseRadius = "8px"
+font = "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+baseFontSize = 14
