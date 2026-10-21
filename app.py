@@ -41,18 +41,25 @@ from src.docxlint.services.network_guard import network_guard  # noqa: E402
 from src.docxlint.services.profile_service import (  # noqa: E402
     ProfileRegistry,
 )
+from src.docxlint import __version__  # noqa: E402
 from src.docxlint.ui.components import (  # noqa: E402
+    LOGO_SVG,
     STAGES,
     check_badges,
     document_stats,
     file_status,
     pill_html,
-    render_badges,
     render_empty_state,
     render_error_banner,
+    render_footer,
+    render_hero,
+    render_landing,
     render_status_bar,
-    stage_progress,
+    render_stepper,
+    render_warning_banner,
+    stepper_steps,
 )
+from src.docxlint.ui.runtime import is_public_demo  # noqa: E402
 from src.docxlint.ui.sections.checks import render_checks_section  # noqa: E402
 from src.docxlint.ui.sections.export import render_export_section  # noqa: E402
 from src.docxlint.ui.sections.repair import render_repair_section  # noqa: E402
@@ -66,6 +73,7 @@ from src.docxlint.utils.errors import ValidationError  # noqa: E402
 
 st.set_page_config(page_title="DocxLint", page_icon="📄", layout="wide")
 inject_theme()
+PUBLIC_DEMO = is_public_demo()
 
 
 @st.cache_resource(show_spinner=False)
@@ -140,45 +148,45 @@ def _read_snapshot(data: bytes):
     return snapshot
 
 
-def _render_sidebar_status(file_box, steps_box, filename, size_label,
+def _render_sidebar_status(file_box, filename, size_label,
                            file_ready: bool) -> None:
     analyzed = file_ready and any(
         st.session_state.get(k) is not None
         for k in ("findings", "foreign_findings", "fmt_findings")
     )
     with file_box:
-        st.markdown("**Status file**")
+        st.markdown("**Dokumen**")
         if filename is None:
             st.caption("Belum ada file diunggah.")
-        else:
-            st.markdown(f"`{filename}`  \n{size_label}")
-            html = "".join(
-                pill_html(f"{b.label}: {b.text}", b.tone, b.icon)
-                for b in file_status(file_ready, analyzed)
-            )
-            st.markdown(f'<div class="dl-row">{html}</div>',
-                        unsafe_allow_html=True)
-    with steps_box:
-        st.markdown("**Tahapan**")
-        icons = {"done": "✓", "current": "→", "todo": "○"}
-        texts = {"done": "Selesai", "current": "Berikutnya", "todo": "Nanti"}
-        items = "".join(
-            f'<li><span aria-hidden="true">{icons[s]}</span>'
-            f"<span>{label}<br><span class=\"dl-step-state\">"
-            f"{texts[s]} · {t}</span></span></li>"
-            for label, s, t in stage_progress(st.session_state, file_ready)
+            return
+        st.markdown(f"`{filename}`  \n{size_label}")
+        html = "".join(
+            pill_html(f"{b.label}: {b.text}", b.tone, b.icon)
+            for b in file_status(file_ready, analyzed)
         )
-        st.markdown(f'<ul class="dl-steps">{items}</ul>',
+        st.markdown(f'<div class="dl-row">{html}</div>',
                     unsafe_allow_html=True)
-        st.caption("Buka tahap lewat tab di area utama.")
+        if not file_ready:
+            return
+        st.markdown("**Status pemeriksaan**")
+        items = "".join(
+            f"<li><span>{b.label}</span>"
+            f"{pill_html(b.text, b.tone, b.icon)}</li>"
+            for b in check_badges(st.session_state)
+        )
+        st.markdown(f'<ul class="dl-side-list">{items}</ul>',
+                    unsafe_allow_html=True)
 
 
 # --- Sidebar --------------------------------------------------------------
 with st.sidebar:
-    st.title("DocxLint")
-    st.caption("Pemeriksa DOCX lokal. Tanpa AI, tanpa jaringan.")
+    st.markdown(
+        '<div class="dl-brand"><div class="dl-logo">'
+        f'{LOGO_SVG}</div><span class="dl-brand-name">DocxLint</span></div>',
+        unsafe_allow_html=True,
+    )
+    st.caption("Pemeriksa dokumen Word. Tanpa AI, tanpa jaringan.")
     sidebar_file_box = st.container()
-    sidebar_steps_box = st.container()
     st.divider()
 
     profiles_dir = _ROOT / CONFIG_DIR_NAME / PROFILES_DIR_NAME
@@ -224,33 +232,41 @@ with st.sidebar:
 
     st.divider()
     st.caption(
-        "Mode lokal: konten dokumen tidak dikirim ke layanan eksternal."
+        "Demo publik: unggah dokumen non-sensitif saja." if PUBLIC_DEMO
+        else "Mode lokal: konten dokumen tidak dikirim ke layanan eksternal."
     )
 
+
+def _stop(filename=None, size_label="", file_ready=False) -> None:
+    _render_sidebar_status(sidebar_file_box, filename, size_label,
+                           file_ready)
+    render_footer(__version__)
+    st.stop()
+
+
 # --- Header & upload -------------------------------------------------------
+render_hero(PUBLIC_DEMO)
+if PUBLIC_DEMO:
+    render_warning_banner(
+        "Ini demo publik",
+        "Jangan unggah dokumen rahasia atau berisi data pribadi. Dokumen "
+        "diproses di memori server dan tidak disimpan ke disk oleh aplikasi.",
+    )
 status_slot = st.container()
-badge_slot = st.container()
 
 uploaded = st.file_uploader(
-    "Unggah file .docx",
+    "Unggah dokumen Word (.docx)",
     type=["docx"],
-    help="Satu dokumen per sesi. File diproses di memori secara lokal.",
+    help="Maksimal 10 MB. Satu dokumen per sesi; file diproses di memori.",
 )
 
 if uploaded is None:
-    with status_slot:
-        st.title("DocxLint")
-    render_empty_state(
-        "Belum ada dokumen",
-        "Unggah file .docx untuk mulai: validasi, pemeriksaan, tinjauan, "
-        "perbaikan, lalu unduh salinan.",
-    )
-    _render_sidebar_status(sidebar_file_box, sidebar_steps_box,
-                           None, "", False)
-    st.stop()
+    render_landing()
+    _stop()
 
 data = uploaded.getvalue()
 filename = uploaded.name
+size_label = f"{len(data) / 1024:.1f} KB"
 validator = DocxValidator()
 
 try:
@@ -259,18 +275,14 @@ try:
         snapshot = _read_snapshot(data)
 except ValidationError as exc:
     render_error_banner("Validasi gagal", str(exc))
-    _render_sidebar_status(sidebar_file_box, sidebar_steps_box,
-                           filename, f"{len(data) / 1024:.1f} KB", False)
-    st.stop()
+    _stop(filename, size_label)
 except Exception:
     render_error_banner(
         "Dokumen tidak dapat diproses",
         "Terjadi kesalahan saat membaca dokumen. Pastikan file adalah "
         "DOCX yang valid lalu coba lagi.",
     )
-    _render_sidebar_status(sidebar_file_box, sidebar_steps_box,
-                           filename, f"{len(data) / 1024:.1f} KB", False)
-    st.stop()
+    _stop(filename, size_label)
 
 stats = document_stats(snapshot.parts)
 
@@ -334,12 +346,11 @@ with tabs[3]:
 with tabs[4]:
     render_export_section(data, filename)
 
-# --- Status bar, badge, sidebar (diisi terakhir agar mencerminkan state
+# --- Status bar, stepper, sidebar (diisi terakhir agar mencerminkan state
 # setelah tombol pada rerun ini diproses) -----------------------------------
 with status_slot:
     render_status_bar(filename, len(data), stats["paragraphs"],
                       stats["tables"])
-with badge_slot:
-    render_badges(check_badges(st.session_state))
-_render_sidebar_status(sidebar_file_box, sidebar_steps_box, filename,
-                       f"{len(data) / 1024:.1f} KB", True)
+    render_stepper(stepper_steps(st.session_state, True))
+_render_sidebar_status(sidebar_file_box, filename, size_label, True)
+render_footer(__version__)

@@ -1,6 +1,5 @@
-streamlit>=1.30,<2
+# Dependensi runtime (dipakai juga oleh Streamlit Community Cloud).
+streamlit>=1.50,<2
 python-docx>=1.1,<2
 lxml>=5,<6
-pytest>=8,<9
-pytest-cov>=5,<6
 PyYAML>=6,<7

@@ -287,6 +287,137 @@ def stage_progress(state: Mapping[str, Any],
     return out
 
 
+def stepper_steps(state: Mapping[str, Any],
+                  file_ready: bool) -> List[dict]:
+    """Data stepper horizontal: nomor, nama, status, keterangan singkat."""
+    progress = stage_progress(state, file_ready)
+    subs = [text for _, _, text in progress]
+    if file_ready:
+        runs = [state.get(k) for k in
+                ("findings", "foreign_findings", "fmt_findings")]
+        done_runs = [r for r in runs if r is not None]
+        if done_runs:
+            total = sum(len(r) for r in done_runs)
+            subs[1] = f"{len(done_runs)}/3 cek · {total} temuan"
+        sel = state.get("selection_state")
+        if sel is not None and sel.selected_ids:
+            subs[2] = f"{len(sel.selected_ids)} dipilih"
+        rs = repair_state(state)
+        if rs == "repair_ready":
+            subs[4] = "Siap diunduh"
+        elif rs == "repair_blocked":
+            subs[3], subs[4] = "Ada kegagalan", "Diblokir"
+    return [
+        {"number": i + 1, "name": name, "status": status, "sub": subs[i]}
+        for i, ((_, name), (_, status, _)) in enumerate(zip(STAGES, progress))
+    ]
+
+
+def stepper_html(steps: Sequence[Mapping[str, Any]]) -> str:
+    items = []
+    for s in steps:
+        status = s["status"]
+        dot = "✓" if status == "done" else str(s["number"])
+        state_text = {"done": "selesai", "current": "tahap berikutnya",
+                      "todo": "belum"}[status]
+        aria = ' aria-current="step"' if status == "current" else ""
+        items.append(
+            f'<li class="dl-{status}"{aria}>'
+            f'<span class="dl-step-dot" aria-hidden="true">{dot}</span>'
+            f'<span class="dl-step-name">{escape(s["name"])}'
+            f'<span class="sr-only"> ({state_text})</span></span>'
+            f'<span class="dl-step-sub">{escape(s["sub"])}</span></li>'
+        )
+    return (
+        '<ol class="dl-stepper" aria-label="Tahapan pemeriksaan">'
+        + "".join(items) + "</ol>"
+    )
+
+
+LOGO_SVG = (
+    '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" '
+    'stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" '
+    'stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
+    '<path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>'
+)
+
+_ICON_PATHS = {
+    "shield": '<path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6z"/>'
+              '<path d="m9 12 2 2 4-4"/>',
+    "search": '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+    "wand": '<path d="m4 20 11-11"/><path d="m14 4 1 2 2 1-2 1-1 2-1-2-2-1 '
+            '2-1z"/><path d="M19 13v3M17.5 14.5h3"/>',
+    "download": '<path d="M12 4v11"/><path d="m7 11 5 5 5-5"/>'
+                '<path d="M5 20h14"/>',
+}
+
+
+def icon_svg(name: str, size: int = 20) -> str:
+    return (
+        f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{_ICON_PATHS[name]}</svg>'
+    )
+
+
+def hero_html(public_demo: bool) -> str:
+    if public_demo:
+        mode_badge = pill_html("Demo publik · dokumen non-sensitif",
+                               "warning", "!")
+    else:
+        mode_badge = pill_html("Diproses lokal", "success", "✓")
+    badges = mode_badge + pill_html("Tanpa AI generatif", "accent", "●")
+    return (
+        '<header class="dl-hero">'
+        f'<div class="dl-logo">{LOGO_SVG}</div>'
+        '<div class="dl-hero-text">'
+        '<div class="dl-hero-title">Docx<span class="dl-grad">Lint</span></div>'
+        '<div class="dl-hero-sub">Periksa ejaan, istilah asing, dan format '
+        "dokumen Word, lalu perbaiki salinannya dengan aman.</div></div>"
+        f'<div class="dl-hero-badges">{badges}</div>'
+        "</header>"
+    )
+
+
+LANDING_FEATURES = (
+    ("shield", "Validasi aman",
+     "ZIP, makro, dan path traversal dicek sebelum dokumen dibaca."),
+    ("search", "Periksa bahasa dan istilah",
+     "Ejaan, kata tidak dikenal, istilah asing, italic, dan format."),
+    ("wand", "Perbaiki dengan persetujuan",
+     "Hanya temuan yang Anda pilih dan konfirmasi yang diterapkan."),
+    ("download", "Unduh salinan",
+     "Dokumen asli tidak pernah ditimpa; hasil divalidasi ulang."),
+)
+
+
+def landing_html() -> str:
+    cards = "".join(
+        '<div class="dl-feature">'
+        f'<div class="dl-feature-ico">{icon_svg(icon)}</div>'
+        f'<div class="dl-feature-title">{escape(title)}</div>'
+        f'<div class="dl-feature-body">{escape(body)}</div></div>'
+        for icon, title, body in LANDING_FEATURES
+    )
+    steps = " → ".join(
+        f"<b>{i}</b>&nbsp;{escape(name)}"
+        for i, (_, name) in enumerate(STAGES, start=1)
+    )
+    return (
+        f'<div class="dl-landing">{cards}</div>'
+        f'<div class="dl-steps-inline">Alur: {steps}</div>'
+    )
+
+
+def footer_html(version: str) -> str:
+    return (
+        f'<div class="dl-footer">DocxLint v{escape(version)} · '
+        "Konten dokumen diproses di memori dan tidak dikirim ke layanan "
+        "eksternal.</div>"
+    )
+
+
 def file_status(file_ready: bool, analyzed: bool) -> List[Badge]:
     """Badge status file: uploaded / validated / analyzed."""
     def b(label: str, ok: bool) -> Badge:
@@ -410,6 +541,22 @@ def render_status_bar(filename: str, size_bytes: int,
     )
 
 
+def render_hero(public_demo: bool) -> None:
+    _st().markdown(hero_html(public_demo), unsafe_allow_html=True)
+
+
+def render_stepper(steps: Sequence[Mapping[str, Any]]) -> None:
+    _st().markdown(stepper_html(steps), unsafe_allow_html=True)
+
+
+def render_landing() -> None:
+    _st().markdown(landing_html(), unsafe_allow_html=True)
+
+
+def render_footer(version: str) -> None:
+    _st().markdown(footer_html(version), unsafe_allow_html=True)
+
+
 def render_badges(badges: Iterable[Badge]) -> None:
     html = "".join(
         pill_html(f"{b.label}: {b.text}", b.tone, b.icon) for b in badges
@@ -486,4 +633,7 @@ __all__ = [
     "render_status_bar", "render_badges", "render_metric_row",
     "render_finding_card", "render_empty_state", "render_error_banner",
     "render_warning_banner", "render_success_banner", "render_meta_card",
+    "stepper_steps", "stepper_html", "hero_html", "landing_html",
+    "footer_html", "icon_svg", "LOGO_SVG", "render_hero",
+    "render_stepper", "render_landing", "render_footer",
 ]

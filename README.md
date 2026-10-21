@@ -20,7 +20,7 @@ unggah, validasi, baca struktur, dan ekspor round-trip.
 - Rollback berbasis bytes (akan datang di Phase 4).
 
 ## Persyaratan
-- Python 3.10+
+- Python 3.10+ (deploy: 3.12)
 - Windows, Linux, atau macOS
 
 ## Instalasi
@@ -29,8 +29,25 @@ unggah, validasi, baca struktur, dan ekspor round-trip.
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # runtime + pytest
+streamlit run app.py
+pytest -q
 ```
+
+`requirements.txt` hanya berisi dependensi runtime (dipakai Streamlit
+Community Cloud); `requirements-dev.txt` menambahkan pytest.
+
+## Deploy ke Streamlit Community Cloud
+
+1. Push branch ke GitHub (`kurniawan-Donn/docx`).
+2. Buka https://share.streamlit.io, masuk dengan akun GitHub, pilih
+   **Create app → Deploy a public app from GitHub**.
+3. Repository `kurniawan-Donn/docx`, branch yang di-push, main file
+   `app.py`. Di **Advanced settings** pilih Python **3.12**.
+4. Di **Secrets**, tambahkan `DOCXLINT_PUBLIC_DEMO = "1"` agar aplikasi
+   menampilkan peringatan demo publik (dokumen non-sensitif saja).
+5. Klik **Deploy**. Konfigurasi `.streamlit/config.toml` (tema, batas upload
+   10 MB, telemetri mati) ikut terbaca otomatis.
 
 ## Phase 3 — Local Language Checker
 
@@ -119,3 +136,12 @@ src/docxlint/ui/sections/      # satu modul per stage
 Folder section sengaja tidak bernama `pages/` agar Streamlit tidak
 menganggapnya aplikasi multi-halaman. Detail design system ada di
 `readme/ui_design.md`.
+
+**Tampilan modern**
+- Header ber-logo dengan badge mode (*Diproses lokal* / *Demo publik*).
+- Stepper horizontal 1–5 yang menunjukkan tahap aktif dan ringkasan tiap
+  tahap (mis. "3/3 cek · 40 temuan", "2 dipilih").
+- Halaman awal dengan dropzone besar dan kartu "cara kerja".
+- Mode **terang dan gelap** mengikuti pilihan tema Streamlit (menu ⋮ →
+  Settings) atau setelan sistem; warna kustom berpindah otomatis lewat CSS
+  `light-dark()`.

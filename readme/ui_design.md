@@ -34,6 +34,20 @@ ui/sections/export.py    Ekspor
   key tidak berubah. Ini mencegah temuan file lama tampil atau diterapkan
   ke file baru.
 
+## 1a. Chrome halaman
+
+- **Header (hero)**: logo SVG inline, judul "DocxLint" bergradien
+  accent→violet, tagline, badge mode. Mode demo publik aktif bila env
+  `DOCXLINT_PUBLIC_DEMO` bernilai `1/true/ya/on` (di Streamlit Cloud: isi
+  lewat Secrets) dan menambah banner peringatan.
+- **Status bar + stepper**: diisi paling akhir dalam rerun. Stepper memakai
+  `stepper_steps()` (murni) dan menandai tahap aktif dengan
+  `aria-current="step"`.
+- **Landing**: dropzone uploader bergaris putus accent + empat kartu fitur
+  dengan ikon SVG inline (tanpa CDN ikon).
+- **Sidebar**: brand, status dokumen, status pemeriksaan (badge), profil.
+- **Footer**: versi paket + pernyataan pemrosesan lokal.
+
 ## 2. Design tokens
 
 ### Warna
@@ -57,13 +71,25 @@ ui/sections/export.py    Ekspor
 memakai varian `*_text`. `secondary` di atas `neutral_soft` hanya ≈4.39:1,
 sehingga pill netral memakai `muted_text`.
 
+### Mode gelap
+
+`DARK` memiliki token yang sama persis dengan `LIGHT` (diuji). CSS
+mendeklarasikan variabel `--dl-*` pada `.stApp` dengan
+`light-dark(terang, gelap)`. Streamlit memasang `color-scheme: light|dark`
+pada `.stApp` sesuai tema aktif, sehingga warna kustom ikut berganti seketika
+saat pengguna mengganti tema, tanpa rerun. `st.context.theme` sengaja tidak
+dipakai karena dapat keliru saat halaman pertama dimuat (Streamlit #11920).
+Browser tanpa `light-dark()` (sebelum 2024) memakai palet terang.
+
+Semua pasangan `TEXT_PAIRS` diuji ≥ 4.5:1 untuk **kedua** palet.
+
 ### Spasi, radius, tipografi
 
 - Spasi: 4 / 8 / 12 / 16 / 24 / 32 px.
-- Radius: 6 px (kecil), 8 px (card, banner, tabel); pill 999 px.
-- Shadow: hanya status bar, `0 1px 2px rgba(17,24,39,.04)`.
+- Radius: 6 px (kecil), 10 px (banner, tabel, kontrol), 12 px (card, metrik), 16 px (hero, dropzone); pill 999 px.
+- Shadow: halus, hanya untuk logo, tab aktif, dan hover card (token `shadow`).
 - Font: `system-ui` stack; mono untuk lokasi (`ui-monospace`, Consolas).
-- Ukuran: dasar 14 px, heading 20–24 px.
+- Ukuran: dasar 14 px, heading 20–26 px, judul hero 26 px.
 
 ## 3. Komponen
 
@@ -156,8 +182,9 @@ menampilkan traceback maupun isi dokumen.
   bar tetap berfungsi tetapi tidak lagi sticky.
 - **Tab tidak dapat dipindah dari kode**; checklist di sidebar hanya
   indikator progres.
-- **Hanya tema terang** (`base = "light"`). CSS kustom belum memiliki varian
-  gelap.
+- `toolbarMode = "minimal"` menyembunyikan tombol Deploy/Rerun dari
+  pengunjung; saat mengembangkan, restart server setelah mengubah modul.
+- Gaya tab bergantung pada `[data-testid=stTab]` (Streamlit 1.65).
 - Semua tab dirender setiap rerun (perilaku `st.tabs`), termasuk pembuatan
   change plan di tab Perbaikan.
 - Hitungan paragraf mengikuti metrik lama: paragraf di dalam sel tabel ikut
