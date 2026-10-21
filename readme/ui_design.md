@@ -11,6 +11,7 @@ untuk tema bawaan Streamlit.
 app.py                 inject_theme → sidebar → upload → validasi/baca → tab stage
 ui/theme.py            token + build_css() + inject_theme()
 ui/components.py       helper murni (dapat ditest) + render_* (Streamlit)
+ui/review_view.py      helper murni Tinjauan: lingkup, grup, urutan, paginasi
 ui/sections/summary.py   Ringkasan
 ui/sections/checks.py    Pemeriksaan
 ui/sections/review.py    Tinjauan  (logika Phase 5 dipindah apa adanya)
@@ -25,7 +26,13 @@ ui/sections/export.py    Ekspor
 - Key `session_state` yang sudah ada tidak diubah. Key baru:
   `_snapshot_cache` (snapshot per hash file), `repair_critical`,
   `chk_review_unlisted`, `btn_check_*`, `dl_roundtrip`,
-  `dl_repaired_export`.
+  `dl_repaired_export`, `rv_scope`, `rv_view`, `rv_page`, `grp_*`,
+  `rsg_*`.
+- **Ganti file**: bila hash file berubah, *isi* key per dokumen
+  (`findings`, `foreign_findings`, `fmt_findings`, `repair_*`, filter,
+  halaman) direset dan `SelectionState` di-reset ke snapshot baru. Nama
+  key tidak berubah. Ini mencegah temuan file lama tampil atau diterapkan
+  ke file baru.
 
 ## 2. Design tokens
 
@@ -83,11 +90,36 @@ sehingga pill netral memakai `muted_text`.
 Card terpilih mendapat border kiri accent 4 px dan latar `accent_soft`
 melalui CSS `:has(input:checked)`, tanpa mengganti key container.
 
+### Mengurangi kebisingan di Tinjauan
+
+Kamus lokal masih kecil, sehingga sebagian besar temuan berupa "kata tidak
+dikenal". Tinjauan karena itu memakai empat lapis penyaring:
+
+1. **Lingkup** (default *Perlu tindakan*). *Perlu tindakan* = temuan yang
+   didukung perbaikan otomatis (ejaan dengan saran, atau italic dengan
+   `expected_italic=true`), sama persis dengan aturan tab Perbaikan.
+   *Informasi* = sisanya. *Semua* = keduanya.
+2. **Tampilan** (default *Per kata*). Temuan dengan kategori, kata
+   (tanpa beda huruf besar/kecil), dan saran yang sama digabung menjadi satu
+   card dengan pill "N lokasi". Checkbox *Pilih semua (N)* dan radio status
+   berlaku untuk semua anggota; daftar lokasi ada di expander. Bila hanya
+   sebagian anggota dipilih, card menampilkan "X dari N lokasi dipilih".
+   `selected_ids` tetap satu-satunya sumber kebenaran pilihan.
+3. **Urutan prioritas**: dapat diperbaiki → severity → confidence →
+   lokasi dokumen. Kelompok besar didahulukan bila prioritasnya sama.
+4. **Paginasi**: 20 card per halaman dengan tombol *Sebelumnya* /
+   *Berikutnya*. Halaman kembali ke 1 setiap kali lingkup, tampilan, atau
+   filter berubah. Tombol pilih massal tetap berlaku untuk semua halaman.
+
+Metrik utama diringkas menjadi Total / Perlu tindakan / Informasi /
+Dipilih; rincian per kategori ada di expander.
+
 ### Filter bar
 
-Pencarian, segmented control (Semua/Dipilih/Belum dipilih), chip
-kategori/severity/confidence (`st.pills`), dan popover *Filter lanjutan*
-(status tinjauan/aplikasi). Hitungan "Menampilkan X dari Y temuan" selalu
+Tiga baris sticky: (1) lingkup, tampilan, pilihan; (2) pencarian dan
+popover *Filter lanjutan* (status tinjauan/aplikasi); (3) chip
+kategori/severity/confidence (`st.pills`). Opsi chip mengikuti lingkup
+aktif, dan nilai yang tidak lagi tersedia dibuang otomatis. Hitungan "Menampilkan X dari Y temuan" selalu
 tampil, dan ada empty state bila filter tidak menyisakan apa pun.
 
 ### Perbaikan
@@ -132,3 +164,7 @@ menampilkan traceback maupun isi dokumen.
   dihitung.
 - Temuan format tampil di tab Pemeriksaan saja; belum masuk alur Tinjauan
   dan Perbaikan.
+- Filter bar sticky setinggi sekitar 210 px pada layar 900 px.
+- Sumber utama kebisingan adalah data, bukan UI: kamus kecil membuat kata
+  umum ditandai "tidak dikenal", dan kata dalam istilah glossary
+  (mis. *machine*, *learning*) juga ditandai terpisah oleh pemeriksa bahasa.

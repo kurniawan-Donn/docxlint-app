@@ -101,6 +101,20 @@ def _dedupe_findings(findings):
     return out
 
 
+# Nilai session_state yang hanya berlaku untuk satu dokumen. Nama key tidak
+# berubah; hanya isinya yang direset saat file berganti.
+_PER_DOCUMENT_KEYS = (
+    "findings", "tokens_scanned", "skipped_runs",
+    "foreign_findings", "foreign_matches",
+    "fmt_findings", "fmt_profile_id", "fmt_profile_version",
+    "fmt_config_hash",
+    "repair_output_bytes", "repair_plan", "repair_report",
+    "repair_critical", "repair_confirm",
+    "flt_cat", "flt_sev", "flt_rev", "flt_app", "flt_conf", "flt_search",
+    "rv_page",
+)
+
+
 def _read_snapshot(data: bytes):
     """Baca snapshot sekali per file.
 
@@ -111,7 +125,17 @@ def _read_snapshot(data: bytes):
     cached = st.session_state.get("_snapshot_cache")
     if cached is not None and cached[0] == digest:
         return cached[1]
+    # File berganti: buang hasil analisis/perbaikan milik file sebelumnya
+    # agar tidak tampil atau diterapkan ke dokumen baru.
+    for key in _PER_DOCUMENT_KEYS:
+        st.session_state.pop(key, None)
     snapshot = read_document(data)
+    selection = st.session_state.get("selection_state")
+    if selection is not None and selection.ensure_snapshot(
+            snapshot.snapshot_id):
+        for k in list(st.session_state.keys()):
+            if k.startswith(("sel_", "rs_", "grp_", "rsg_")):
+                del st.session_state[k]
     st.session_state["_snapshot_cache"] = (digest, snapshot)
     return snapshot
 

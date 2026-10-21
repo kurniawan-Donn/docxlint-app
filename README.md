@@ -100,7 +100,7 @@ pratinjau → tinjauan → perbaikan → unduh.
 |-----|-----|
 | 📋 Ringkasan | Metadata dokumen, konfigurasi aktif, pratinjau struktur. |
 | 🔍 Pemeriksaan | Tombol cek bahasa, istilah asing, dan format beserta metriknya. |
-| 📝 Tinjauan | Filter bar sticky (cari + chip kategori/severity/confidence), toolbar pilih massal, card temuan. |
+| 📝 Tinjauan | Lingkup *Perlu tindakan* / *Informasi*, tampilan *Per kata* (temuan sama digabung), filter bar sticky, paginasi 20 card. |
 | 🛠️ Perbaikan | Tabel change plan, konfirmasi wajib, ringkasan hasil, unduhan. |
 | 📦 Ekspor | Unduh round-trip dan hasil perbaikan (jika validasi lolos). |
 

@@ -308,19 +308,26 @@ def pill_html(text: str, tone: str = "neutral", icon: str = "") -> str:
     )
 
 
-def finding_header_html(f: Any) -> str:
-    """HTML kepala card temuan (pill + nilai + saran + alasan + lokasi)."""
+def finding_header_html(f: Any, occurrences: int = 1) -> str:
+    """HTML kepala card temuan (pill + nilai + saran + alasan + lokasi).
+
+    `occurrences` > 1 dipakai card kelompok: lokasi diringkas menjadi
+    jumlah lokasi plus lokasi pertama.
+    """
     band = confidence_band(f.confidence)
     conf_text, conf_tone, conf_icon = CONFIDENCE_LABELS[band]
     sev_tone, sev_icon, sev_text = SEVERITY_META.get(
         f.severity, ("neutral", "○", f.severity)
     )
-    pills = "".join([
+    pill_list = [
         pill_html(category_label(f.category), "neutral"),
         pill_html(f"Severity: {sev_text}", sev_tone, sev_icon),
         pill_html(f"Confidence: {confidence_label(f.confidence)}",
                   conf_tone, conf_icon),
-    ])
+    ]
+    if occurrences > 1:
+        pill_list.append(pill_html(f"{occurrences} lokasi", "accent", "×"))
+    pills = "".join(pill_list)
     title = f'<span class="dl-card-title">{escape(f.original_value or "")}</span>'
     if f.suggested_value:
         title += (
@@ -330,11 +337,15 @@ def finding_header_html(f: Any) -> str:
     loc = f.location
     location = format_location(loc.block_path, loc.run_index,
                                loc.char_start, loc.char_end)
+    loc_label = (
+        f"Lokasi pertama dari {occurrences}: " if occurrences > 1
+        else "Lokasi: "
+    )
     return (
         f'<div class="dl-row">{pills}</div>'
         f"<div>{title}</div>"
         f'<div class="dl-muted">{escape(f.reason or "")}</div>'
-        f'<div class="dl-mono">Lokasi: {escape(location)}</div>'
+        f'<div class="dl-mono">{loc_label}{escape(location)}</div>'
     )
 
 
@@ -416,9 +427,10 @@ def render_metric_row(metrics: Sequence[Tuple[str, Any]],
         col.metric(label, value, help=h, border=True)
 
 
-def render_finding_card(f: Any) -> None:
+def render_finding_card(f: Any, occurrences: int = 1) -> None:
     """Kepala card; dipanggil di dalam container ber-border."""
-    _st().markdown(finding_header_html(f), unsafe_allow_html=True)
+    _st().markdown(finding_header_html(f, occurrences),
+                   unsafe_allow_html=True)
 
 
 def render_empty_state(title: str, body: str = "") -> None:
