@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="t d">
+  <title id="t">DocxLint</title>
+  <desc id="d">Pemeriksa ejaan, istilah asing, dan format dokumen Word berbahasa Indonesia yang berjalan lokal.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E3A8A"/>
+      <stop offset="0.55" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="logo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.12"/>
+    </linearGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#FFFFFF" fill-opacity="0.10"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="300" rx="24" fill="url(#bg)"/>
+  <rect width="1200" height="300" rx="24" fill="url(#dots)"/>
+
+  <!-- dokumen dekoratif di kanan -->
+  <g transform="translate(905 46) rotate(6)" opacity="0.95">
+    <rect width="200" height="230" rx="16" fill="#FFFFFF"/>
+    <rect x="24" y="30" width="120" height="12" rx="6" fill="#CBD5E1"/>
+    <rect x="24" y="62" width="150" height="9" rx="4.5" fill="#E2E8F0"/>
+    <rect x="24" y="82" width="58" height="9" rx="4.5" fill="#E2E8F0"/>
+    <rect x="88" y="78" width="70" height="17" rx="8.5" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+    <rect x="96" y="83" width="54" height="7" rx="3.5" fill="#D97706" fill-opacity="0.55"/>
+    <rect x="24" y="104" width="140" height="9" rx="4.5" fill="#E2E8F0"/>
+    <rect x="24" y="124" width="96" height="9" rx="4.5" fill="#E2E8F0"/>
+    <rect x="24" y="144" width="150" height="9" rx="4.5" fill="#E2E8F0"/>
+    <rect x="24" y="164" width="72" height="9" rx="4.5" fill="#E2E8F0"/>
+    <circle cx="160" cy="194" r="22" fill="#059669"/>
+    <path d="m150 194 7 7 13-14" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- logo -->
+  <g transform="translate(64 70)">
+    <rect width="88" height="88" rx="22" fill="url(#logo)" stroke="#FFFFFF" stroke-opacity="0.35"/>
+    <g transform="translate(20 18) scale(2)" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+      <path d="M14 3v5h5"/>
+      <path d="m9 14 2 2 4-4"/>
+    </g>
+  </g>
+
+  <g font-family="'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif" fill="#FFFFFF">
+    <text x="176" y="132" font-size="64" font-weight="800" letter-spacing="-1.5">DocxLint</text>
+    <text x="178" y="172" font-size="22" fill-opacity="0.92">Pemeriksa ejaan, istilah asing, dan format dokumen Word</text>
+    <text x="178" y="202" font-size="22" fill-opacity="0.92">berbahasa Indonesia, berjalan sepenuhnya lokal.</text>
+
+    <g font-size="15" font-weight="600">
+      <rect x="64" y="226" width="150" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.35"/>
+      <text x="139" y="248" text-anchor="middle">✓ Diproses lokal</text>
+      <rect x="226" y="226" width="172" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.35"/>
+      <text x="312" y="248" text-anchor="middle">Tanpa AI generatif</text>
+      <rect x="410" y="226" width="210" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.35"/>
+      <text x="515" y="248" text-anchor="middle">Review sebelum perbaikan</text>
+    </g>
+  </g>
+</svg>
