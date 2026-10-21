@@ -1,0 +1,33 @@
+schema_version: 1
+profile_id: academic_report
+name: Laporan Akademik Umum
+description: Template laporan akademik umum (bukan standar resmi institusi manapun).
+version: "1.0.0"
+source: builtin
+notes: Gunakan sebagai titik awal. Sesuaikan sebelum dipakai untuk submission resmi.
+editorial_policy:
+  review_configured_foreign_terms: true
+  review_unlisted_foreign_candidates: false
+  respect_existing_italic: true
+rules:
+  FMT_FONT_FAMILY:
+    enabled: true
+    severity: medium
+    params:
+      allowed: ["Times New Roman", "Cambria"]
+  FMT_FONT_SIZE:
+    enabled: true
+    severity: medium
+    params:
+      allowed_pt: [11, 12]
+  FMT_ALIGNMENT:
+    enabled: false
+  FMT_LINE_SPACING:
+    enabled: true
+    severity: low
+    params:
+      allowed: [1.5]
+  FMT_PARAGRAPH_SPACING:
+    enabled: false
+  FMT_INDENT:
+    enabled: false

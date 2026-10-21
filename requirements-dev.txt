@@ -1,0 +1,4 @@
+# Dependensi pengembangan: runtime + test.
+-r requirements.txt
+pytest>=8,<9
+pytest-cov>=5,<6

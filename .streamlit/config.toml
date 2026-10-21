@@ -1,0 +1,36 @@
+# Harus berada di `.streamlit/` (dengan titik) agar dibaca Streamlit.
+
+[browser]
+# Mode lokal: jangan kirim telemetri penggunaan.
+gatherUsageStats = false
+
+[server]
+headless = true
+# Selaras dengan batas DocxValidator (10 MB).
+maxUploadSize = 10
+
+[client]
+# Jangan tampilkan menu multipage otomatis.
+showSidebarNavigation = false
+# Sembunyikan tombol Deploy/opsi developer dari pengunjung.
+toolbarMode = "minimal"
+
+[theme]
+# Token sinkron dengan src/docxlint/ui/theme.py.
+font = "system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+baseFontSize = 14
+baseRadius = "10px"
+
+[theme.light]
+primaryColor = "#2563EB"
+backgroundColor = "#F7F8FB"
+secondaryBackgroundColor = "#EEF1F6"
+textColor = "#111827"
+borderColor = "#E3E7EE"
+
+[theme.dark]
+primaryColor = "#60A5FA"
+backgroundColor = "#0D1117"
+secondaryBackgroundColor = "#161B22"
+textColor = "#E6EDF3"
+borderColor = "#2D333B"
